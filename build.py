@@ -603,16 +603,15 @@ h2.sec{margin:0 0 24px;font:800 1.7rem/1.1 var(--serif);letter-spacing:-.015em}
 .sb-btn:hover{background:#ffd45e}
 .sb-btn svg{width:18px;height:18px;flex:none}
 .actions{margin:0 0 8px;display:flex;flex-direction:column;gap:12px}
-.actions[hidden],.pill[hidden]{display:none}
+.actions[hidden],.round[hidden]{display:none}
 .actions-title{font:700 .95rem var(--sans);color:var(--muted)}
 .actions-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
-.pill{display:inline-flex;align-items:center;gap:9px;padding:11px 20px;border-radius:999px;border:2px solid var(--ink);background:transparent;color:var(--ink);font:700 .95rem var(--sans);cursor:pointer}
-.pill svg,.round svg{width:20px;height:20px;flex:none}
-.pill:hover{background:var(--ink);color:var(--paper)}
-.pill.solid{background:var(--ink);color:var(--paper)}
-.pill.solid:hover{background:var(--sun);border-color:var(--sun);color:#012d5c}
-.pill.ok,.pill.solid.ok{background:#1f9d6e;border-color:#1f9d6e;color:#fff}
-.round{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%;border:2px solid var(--line);background:var(--paper);color:var(--ink)}
+.round svg{width:20px;height:20px;flex:none}
+.round.solid{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.round.solid:hover{background:var(--sun);border-color:var(--sun);color:#012d5c}
+.round.ok,.round.solid.ok{background:#1f9d6e;border-color:#1f9d6e;color:#fff}
+.copy-msg{font:600 .92rem var(--sans);color:#1f9d6e}
+.round{cursor:pointer;padding:0;display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%;border:2px solid var(--line);background:var(--paper);color:var(--ink)}
 .round:hover{background:var(--ink);border-color:var(--ink);color:var(--paper)}
 .related{margin:56px 0 24px}
 
@@ -704,17 +703,15 @@ JS = r"""
     var cn=document.querySelector('link[rel=canonical]'),url=cn?cn.href:location.href,
         title=act.getAttribute('data-title')||document.title,e=encodeURIComponent;
     var nets={whatsapp:'https://wa.me/?text='+e(title+' '+url),
-      x:'https://x.com/intent/post?text='+e(title)+'&url='+e(url),
-      facebook:'https://www.facebook.com/sharer/sharer.php?u='+e(url),
-      mail:'mailto:?subject='+e(title)+'&body='+e(url)};
+      x:'https://x.com/intent/post?text='+e(title)+'&url='+e(url)};
     act.querySelectorAll('[data-net]').forEach(function(a){a.href=nets[a.getAttribute('data-net')]});
     var sh=act.querySelector('[data-share]');
     if(sh&&navigator.share){sh.hidden=false;sh.addEventListener('click',function(){navigator.share({title:title,url:url}).catch(function(){})})}
-    var cp=act.querySelector('[data-copy]');
+    var cp=act.querySelector('[data-copy]'),msg=act.querySelector('.copy-msg');
     if(cp){
-      var lbl=cp.querySelector('.lbl'),orig=lbl.textContent;
-      var done=function(ok){lbl.textContent=ok?'Enlace copiado':'No se pudo copiar';cp.classList.toggle('ok',ok);
-        setTimeout(function(){lbl.textContent=orig;cp.classList.remove('ok')},2200)};
+      var tm=null;
+      var done=function(ok){msg.textContent=ok?'Enlace copiado':'No se pudo copiar';cp.classList.toggle('ok',ok);
+        clearTimeout(tm);tm=setTimeout(function(){msg.textContent='';cp.classList.remove('ok')},2200)};
       var fallback=function(){var t=document.createElement('textarea');t.value=url;t.style.position='fixed';t.style.opacity='0';
         document.body.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy')}catch(x){}t.remove();done(ok)};
       cp.addEventListener('click',function(){
@@ -750,9 +747,7 @@ def _svg(inner, fill=False):
 ICON_EXT = _svg('<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>')
 ICON_SHARE = _svg('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>')
 ICON_LINK = _svg('<path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/>')
-ICON_MAIL = _svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>')
 ICON_X = _svg('<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>', True)
-ICON_FB = _svg('<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>', True)
 ICON_WA = _svg('<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>', True)
 
 
@@ -889,12 +884,11 @@ def render_article(a, arts):
                   f'<p>{esc(sb_text)}</p></div><a class="sb-btn" href="{esc(a["url"])}" target="_blank" rel="noopener">'
                   f'{esc(sb_btn)}{ICON_EXT}</a></aside>')
     actions = (f'<div class="actions" hidden data-title="{esc(a["title"])}"><span class="actions-title">Comparte esta historia</span>'
-               f'<div class="actions-row"><button type="button" class="pill" data-share hidden>{ICON_SHARE}<span>Compartir</span></button>'
+               f'<div class="actions-row"><button type="button" class="round" data-share hidden aria-label="Compartir" title="Compartir">{ICON_SHARE}</button>'
                f'<a class="round" data-net="whatsapp" target="_blank" rel="noopener" aria-label="Compartir en WhatsApp" title="WhatsApp">{ICON_WA}</a>'
                f'<a class="round" data-net="x" target="_blank" rel="noopener" aria-label="Compartir en X" title="X">{ICON_X}</a>'
-               f'<a class="round" data-net="facebook" target="_blank" rel="noopener" aria-label="Compartir en Facebook" title="Facebook">{ICON_FB}</a>'
-               f'<a class="round" data-net="mail" aria-label="Enviar por correo" title="Correo">{ICON_MAIL}</a>'
-               f'<button type="button" class="pill solid" data-copy>{ICON_LINK}<span class="lbl">Copiar enlace</span></button></div></div>')
+               f'<button type="button" class="round solid" data-copy aria-label="Copiar enlace" title="Copiar enlace">{ICON_LINK}</button>'
+               f'<span class="copy-msg" role="status" aria-live="polite"></span></div></div>')
     body = (f'<article class="nota"><a class="chip {cat_cls(a["category"])}" href="../categoria/{slugify(a["category"])}.html">'
             f'<i></i>{esc(a["category"])}</a><h1>{esc(a["title"])}</h1>'
             f'<div class="meta"><b>{esc(a["source"])}</b><time datetime="{esc(a["date"])}">{fmt_date(a["date"])}</time></div>'
