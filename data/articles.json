@@ -1,5 +1,17 @@
 [
  {
+  "id": "71dc06e542",
+  "slug": "brookhaven-desarrolla-una-tecnologia-de-rayos-x-que-acelera--71dc06e542",
+  "title": "Brookhaven desarrolla una tecnología de rayos X que acelera la identificación de partículas de contaminación atmosférica",
+  "summary": "El laboratorio Brookhaven estudia la posibilidad de detectar las partículas de contaminación por medio de sistemas tecnológicos avanzados. Cuando la contaminación está presente en el aire, no siempre es fácil de ver a simple vista; las partículas pueden ser microscópicas, pero igualmente causan problemas respiratorios y de salud e inciden en el calentamiento global. Avance en la detección de partículas de contaminación Las partículas en el aire de contaminación se les conoce como material particulado (PM), las cuales son microscópicas y provienen de la quema de combustibles fósiles, polvo, procesos industriales, entre otros.",
+  "category": "Ciencia",
+  "image": "https://www.ecoportal.net/wp-content/uploads/2026/11/jr-korpa-y3lfXX_1nYw-unsplash-1.jpg",
+  "img_tried": true,
+  "source": "Ecoportal",
+  "url": "https://www.ecoportal.net/tecnologia/rayos-x-particulas-de-contaminacion/",
+  "date": "2026-11-14T21:10:48+00:00"
+ },
+ {
   "id": "069d8b4928",
   "slug": "una-empresa-danesa-convierten-el-pan-sobrante-de-las-panader-069d8b4928",
   "title": "Una empresa danesa convierten el pan sobrante de las panaderías en pasta: ya han recuperado 10 toneladas",
@@ -546,6 +558,18 @@
   "img_tried": true
  },
  {
+  "id": "052dfedbe1",
+  "slug": "nueva-via-para-identificar-receptores-celulares-que-podria-e-052dfedbe1",
+  "title": "Nueva vía para identificar receptores celulares que podría emplearse en diseñar tratamientos",
+  "summary": "Investigadores del Centro de Regulación Genómica (CRG) han desarrollado una nueva forma de identificar receptores como dianas farmacológicas en una familia de proteínas que podría ayudar a diseñar tratamientos con menos efectos secundarios en distintas enfermedades. El método permite crear mapas funcionales de receptores acoplados a proteínas G (o GPCR, por sus siglas en inglés), un tipo de molécula que se asienta en la superficie de una célula. Uno de cada tres fármacos aprobados en todo el mundo se dirige a esta familia molecular. Existen 800 tipos diferentes de receptores acoplados a proteínas G (function () { const copyText = text => navigator.clipboard ?",
+  "category": "Ciencia",
+  "image": "https://www.agenciasinc.es/var/ezwebin_site/storage/images/noticias/sondas-fluorescentes-permiten-obtener-imagenes-del-adn-con-una-resolucion-insolita/12440497-1-esl-MX/Sondas-fluorescentes-permiten-obtener-imagenes-del-ADN-con-una-resolucion-insolita.jpg",
+  "img_tried": true,
+  "source": "Agencia SINC",
+  "url": "http://www.agenciasinc.es/Noticias/nueva-via-para-identificar-receptores-celulares-que-podria-emplearse-en-disenar-tratamientos",
+  "date": "2026-11-12T07:30:04+00:00"
+ },
+ {
   "id": "42df8efe5a",
   "slug": "el-agujero-de-ozono-en-2026-es-el-septimo-mas-grande-en-48-a-42df8efe5a",
   "title": "El agujero de ozono en 2026 es el séptimo más grande en 48 años",
@@ -967,6 +991,18 @@
   "date": "2026-11-06T10:00:03+00:00"
  },
  {
+  "id": "511885b875",
+  "slug": "el-lince-iberico-recurre-a-las-crias-de-milano-negro-por-la--511885b875",
+  "title": "El lince ibérico recurre a las crías de milano negro por la sequía y la escasez de alimento en Doñana",
+  "summary": "En el Parque Nacional de Doñana, el lince ibérico ha comenzado a depredar los polluelos de un ave rapaz, el milano negro, hasta el punto de acabar en 2018 con casi la mitad de las crías de la población en el área de estudio. No se trata de un cambio de comportamiento caprichoso: la escasez de sus presas habituales y la sequía han llevado a esta especie protegida a buscar nuevos alimentos. Este nivel de depredación no tiene precedentes en las tres décadas que los investigadores han estudiado ambas especies en un sector de 10 kilómetros cuadrados del Parque Nacional: hasta ahora habían coexistido alimentándose de conejos.",
+  "category": "Ciencia",
+  "image": "https://www.agenciasinc.es/var/ezwebin_site/storage/images/noticias/el-lince-boreal-sobrevivio-en-la-peninsula-hasta-el-siglo-xix/12398048-5-esl-MX/El-lince-boreal-sobrevivio-en-la-Peninsula-hasta-el-siglo-XIX.jpg",
+  "img_tried": true,
+  "source": "Agencia SINC",
+  "url": "http://www.agenciasinc.es/Noticias/el-lince-iberico-recurre-a-las-crias-de-milano-negro-por-la-sequia-y-la-escasez-de-alimento-en-donana",
+  "date": "2026-11-06T08:44:26+00:00"
+ },
+ {
   "id": "a0888cd9ee",
   "slug": "the-spark-when-communities-own-the-land-housing-stays-afford-a0888cd9ee",
   "title": "The Spark: When Communities Own the Land, Housing Stays Affordable",
@@ -1002,6 +1038,30 @@
   "date": "2026-11-05T15:35:06+00:00"
  },
  {
+  "id": "6d78976141",
+  "slug": "y-si-una-reflexion-sobre-lo-que-podriamos-haber-vivido-6d78976141",
+  "title": "«Y si...»: una reflexión sobre lo que podríamos haber vivido",
+  "summary": "Todas las personas sienten nostalgia de lo no vivido, nostalgia por aquello que no sucedió y quizás, estuvo en nuestra mano que sucediera. Este artículo de Cultura Inquieta «Y si...»: una reflexión sobre lo que podríamos haber vivido se publicó en Cultura Inquieta .",
+  "category": "Comunidad",
+  "image": "",
+  "img_tried": true,
+  "source": "Cultura Inquieta",
+  "url": "https://culturainquieta.com/estimulante/y-si-una-reflexion-sobre-lo-que-podriamos-haber-vivido/",
+  "date": "2026-11-05T12:19:58+00:00"
+ },
+ {
+  "id": "7edea90bcf",
+  "slug": "jordi-flores-tiendas-de-campana-para-reclamar-el-derecho-a-u-7edea90bcf",
+  "title": "Jordi Flores: tiendas de campaña para reclamar el derecho a un hogar",
+  "summary": "La acampada por la vivienda de Barcelona que fotografía Jordi Flores convierte esa necesidad en una reclamación colectiva, con los jóvenes como protagonistas de una protesta que pide leyes que garanticen el derecho a un hogar. Este artículo de Cultura Inquieta Jordi Flores: tiendas de campaña para reclamar el derecho a un hogar se publicó en Cultura Inquieta .",
+  "category": "Comunidad",
+  "image": "",
+  "img_tried": true,
+  "source": "Cultura Inquieta",
+  "url": "https://culturainquieta.com/arte/fotografia/jordi-flores-tiendas-de-campana-para-reclamar-el-derecho-a-un-hogar/",
+  "date": "2026-11-05T11:30:00+00:00"
+ },
+ {
   "id": "64b5df7b9e",
   "slug": "descubren-las-bases-moleculares-que-explican-como-un-entorno-64b5df7b9e",
   "title": "Descubren las bases moleculares que explican cómo un entorno estimulante potencia la plasticidad cerebral",
@@ -1033,6 +1093,18 @@
   "source": "Noticias ONU - ODS",
   "url": "https://news.un.org/feed/view/es/story/2026/11/1542141",
   "date": "2026-11-04T12:00:00+00:00"
+ },
+ {
+  "id": "b9d239bd80",
+  "slug": "las-100-peliculas-espanolas-mejor-puntuadas-en-letterboxd-b9d239bd80",
+  "title": "Las 100 películas españolas mejor puntuadas en LetterBoxd",
+  "summary": "A todos los hitos que ya ha conseguido \"La bola negra\", hay que sumar que en LetterBoxd se ha situado como la película española mejor valorada de la historia. Este artículo de Cultura Inquieta Las 100 películas españolas mejor puntuadas en LetterBoxd se publicó en Cultura Inquieta .",
+  "category": "Comunidad",
+  "image": "",
+  "img_tried": true,
+  "source": "Cultura Inquieta",
+  "url": "https://culturainquieta.com/cine/las-100-peliculas-espanolas-mejor-puntuadas-en-letterboxd/",
+  "date": "2026-11-03T16:37:54+00:00"
  },
  {
   "id": "ee39a1de9b",
@@ -1080,6 +1152,30 @@
   "date": "2026-10-29T18:45:01+00:00"
  },
  {
+  "id": "dba502dcc8",
+  "slug": "cultura-inquieta-lanza-la-3a-edicion-del-concurso-de-micro-c-dba502dcc8",
+  "title": "Cultura Inquieta lanza la 3ª edición del concurso de micro-cine «Historias de inclusión», con 3000 € en premios",
+  "summary": "Cultura Inquieta presenta Historias de inclusión 3, un concurso audiovisual que invita a contar historias capaces de mostrar la diversidad. Este artículo de Cultura Inquieta Cultura Inquieta lanza la 3ª edición del concurso de micro-cine «Historias de inclusión», con 3000 € en premios se publicó en Cultura Inquieta .",
+  "category": "Cultura",
+  "image": "",
+  "img_tried": true,
+  "source": "Cultura Inquieta",
+  "url": "https://culturainquieta.com/cine/cultura-inquieta-lanza-la-tercera-edicion-del-concurso-de-cine-historias-de-inclusion-con-3000-euros-en-premios/",
+  "date": "2026-10-29T13:27:26+00:00"
+ },
+ {
+  "id": "6111cb5828",
+  "slug": "sensory-activation-la-pintura-de-isabela-cordoba-torres-6111cb5828",
+  "title": "Sensory Activation: la pintura de Isabela Córdoba Torres",
+  "summary": "La pintura de Isabela Córdoba Torres se sitúa en un territorio de convergencia entre arte, ciencia y experiencia corporal Este artículo de Cultura Inquieta Sensory Activation: la pintura de Isabela Córdoba Torres se publicó en Cultura Inquieta .",
+  "category": "Ciencia",
+  "image": "",
+  "img_tried": true,
+  "source": "Cultura Inquieta",
+  "url": "https://culturainquieta.com/arte/pintura/sensory-activation-la-pintura-de-isabela-cordoba-torres/",
+  "date": "2026-10-29T13:12:21+00:00"
+ },
+ {
   "id": "ce370bda3e",
   "slug": "trabajo-de-cuidados-seguridad-maritima-restauracion-de-la-na-ce370bda3e",
   "title": "Trabajo de cuidados, seguridad marítima, restauración de la naturaleza, contaminación… Las noticias del jueves",
@@ -1089,6 +1185,18 @@
   "source": "Noticias ONU - ODS",
   "url": "https://news.un.org/feed/view/es/story/2026/10/1542122",
   "date": "2026-10-29T12:00:00+00:00"
+ },
+ {
+  "id": "375b078cd0",
+  "slug": "los-videos-ganadores-del-concurso-sana-mente-375b078cd0",
+  "title": "Los vídeos ganadores del concurso «Sana-mente»",
+  "summary": "El objetivo era crear un espacio de reflexión que pusiera de manifiesto la importancia de sentirnos sanos en todos los sentidos. Este artículo de Cultura Inquieta Los vídeos ganadores del concurso «Sana-mente» se publicó en Cultura Inquieta .",
+  "category": "Comunidad",
+  "image": "",
+  "img_tried": true,
+  "source": "Cultura Inquieta",
+  "url": "https://culturainquieta.com/cine/los-videos-ganadores-del-concurso-sana-mente/",
+  "date": "2026-10-29T10:55:58+00:00"
  },
  {
   "id": "e3f2f90790",
@@ -1102,6 +1210,18 @@
   "date": "2026-10-27T17:23:08+00:00"
  },
  {
+  "id": "ad1b40a4f0",
+  "slug": "cosas-que-me-dan-miedo-de-verdad-y-no-solo-son-monstruos-ad1b40a4f0",
+  "title": "Cosas que me dan miedo de verdad (y no solo son monstruos)",
+  "summary": "Me pregunto: ¿por qué demonios queremos pasar miedo? Este artículo de Cultura Inquieta Cosas que me dan miedo de verdad (y no solo son monstruos) se publicó en Cultura Inquieta .",
+  "category": "Comunidad",
+  "image": "",
+  "img_tried": true,
+  "source": "Cultura Inquieta",
+  "url": "https://culturainquieta.com/estilo-de-vida/cosas-que-me-dan-miedo-de-verdad-y-no-solo-son-monstruos/",
+  "date": "2026-10-26T15:22:13+00:00"
+ },
+ {
   "id": "9c6fac8932",
   "slug": "quien-tiene-la-llave-del-cielo-9c6fac8932",
   "title": "¿Quién tiene la llave del cielo?",
@@ -1111,6 +1231,18 @@
   "source": "Noticias Positivas",
   "url": "https://noticiaspositivas.org/quien-tiene-llave-cielo/",
   "date": "2026-10-26T13:38:49+00:00"
+ },
+ {
+  "id": "46a4ac1745",
+  "slug": "kave-gallery-el-arte-de-hacer-hogar-a-traves-del-arte-46a4ac1745",
+  "title": "Kave Gallery: el arte de hacer hogar a través del arte",
+  "summary": "Kave, la marca de diseño de muebles y decoración, creó la Kave Gallery: un proyecto que nace para preservar las historias del Mediterráneo a través del arte. Este artículo de Cultura Inquieta Kave Gallery: el arte de hacer hogar a través del arte se publicó en Cultura Inquieta .",
+  "category": "Cultura",
+  "image": "",
+  "img_tried": true,
+  "source": "Cultura Inquieta",
+  "url": "https://culturainquieta.com/arte/kave-gallery-el-arte-de-hacer-hogar-a-traves-del-arte/",
+  "date": "2026-10-23T07:38:44+00:00"
  },
  {
   "id": "96ebfec45a",
@@ -1135,6 +1267,18 @@
   "source": "Dialogue Earth",
   "url": "https://dialogue.earth/es/bosques/reserva-biosfera-maya-de-guatemala-enfrenta-retos/",
   "date": "2026-10-21T15:48:42+00:00"
+ },
+ {
+  "id": "0b8eb3d83d",
+  "slug": "siete-mujeres-que-estan-redefiniendo-la-creatividad-offf-sev-0b8eb3d83d",
+  "title": "Siete mujeres que están redefiniendo la creatividad: OFFF Sevilla 2026",
+  "summary": "OFFF Sevilla 2026 reunirá a profesionales internacionales del diseño, el arte, la comunicación y la tecnología. Este artículo de Cultura Inquieta Siete mujeres que están redefiniendo la creatividad: OFFF Sevilla 2026 se publicó en Cultura Inquieta .",
+  "category": "Tecnología",
+  "image": "",
+  "img_tried": true,
+  "source": "Cultura Inquieta",
+  "url": "https://culturainquieta.com/arte/arte-digital/siete-mujeres-que-estan-redefiniendo-la-creatividad-offf-sevilla-2026/",
+  "date": "2026-10-21T15:35:41+00:00"
  },
  {
   "id": "0e552acf3c",
