@@ -22,7 +22,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 try:
     from zoneinfo import ZoneInfo
@@ -70,6 +70,64 @@ def truncate(s, n):
     if len(s) <= n:
         return s
     return s[:n].rsplit(" ", 1)[0].rstrip(",.;:") + "…"
+
+
+def truncate_sentence(s, n):
+    """Recorta a n caracteres, preferiblemente en un punto final."""
+    if len(s) <= n:
+        return s
+    cut = s[:n]
+    m = max(cut.rfind(". "), cut.rfind("? "), cut.rfind("! "), cut.rfind(".\n"))
+    if m >= n * 0.55:
+        return cut[:m + 1]
+    return truncate(s, n)
+
+
+BOILERPLATE = re.compile(r"^(La entrada|El art[ií]culo|The post|Compart|S[ií]guenos|Te puede interesar|Lee tambi[eé]n|"
+                         r"Leer m[aá]s|Suscr[ií]bete|Newsletter|Publicidad|Foto:|Imagen:)", re.I)
+
+
+def html_to_paragraphs(h, max_chars=30000):
+    """Convierte HTML en una lista de párrafos de texto plano (sin imágenes ni scripts)."""
+    h = re.sub(r"<(script|style|figure|aside|iframe|noscript)\b.*?</\1>", " ", h or "", flags=re.S | re.I)
+    h = re.sub(r"</(p|h[1-6]|li|blockquote|div|ul|ol)>|<br\s*/?>", "\n\n", h, flags=re.I)
+    h = html.unescape(re.sub(r"<[^>]+>", " ", h))
+    out, total = [], 0
+    for p in re.split(r"\n\s*\n", h):
+        p = re.sub(r"[ \t\r\f\v\n]+", " ", p).strip()
+        if len(p) < 30 or BOILERPLATE.match(p) or (out and out[-1] == p):
+            continue
+        if total + len(p) > max_chars:
+            break
+        out.append(p)
+        total += len(p)
+    return out
+
+
+def paragraphs(a):
+    """Párrafos para mostrar en la página de la nota."""
+    if a.get("body"):
+        return a["body"]
+    s = (a.get("summary") or "").strip()
+    if "\n\n" in s:
+        return [p.strip() for p in s.split("\n\n") if p.strip()]
+    sents = re.split(r"(?<=[.!?…])\s+(?=[A-ZÁÉÍÓÚÑ¿¡0-9«\"“])", s)
+    out, cur = [], ""
+    for x in sents:
+        if cur and len(cur) + len(x) > 340:
+            out.append(cur)
+            cur = x
+        else:
+            cur = (cur + " " + x).strip()
+    if cur:
+        out.append(cur)
+    return out
+
+
+def teaser(a, n):
+    """Entradilla corta para tarjetas, portada, buscador y RSS."""
+    ps = paragraphs(a)
+    return truncate_sentence(ps[0], n) if ps else ""
 
 
 def fmt_date(iso):
@@ -312,7 +370,7 @@ def call_claude(prompt):
     if not key:
         return None
     body = json.dumps({
-        "model": CFG["ai_model"], "max_tokens": 500,
+        "model": CFG["ai_model"], "max_tokens": 1500,
         "messages": [{"role": "user", "content": prompt}],
     }).encode()
     req = urllib.request.Request(
@@ -334,17 +392,17 @@ Evalúa esta nota y responde SOLO con un JSON válido, sin texto extra:
 Reglas:
 - positiva=false si trata principalmente de tragedia, violencia, política polarizante, o es publicidad/clickbait.
 - titulo: título claro en español, sin sensacionalismo (máx. 100 caracteres).
-- resumen: 2 frases ORIGINALES en español (no copies frases del texto), máx. {CFG['summary_max_chars']} caracteres.
+- resumen: cuenta la historia en 3 o 4 párrafos cortos, con TUS PROPIAS palabras en español (no copies frases del texto), separados por una línea en blanco, máx. {CFG.get('ai_summary_max_chars', 1500)} caracteres en total.
 - categoria: una de [{cats}].
 
 Título original: {title}
-Texto: {summary[:1200]}"""
+Texto: {summary[:4000]}"""
     try:
         txt = call_claude(prompt)
         if not txt:
             return None
         m = re.search(r"\{.*\}", txt, re.S)
-        return json.loads(m.group(0)) if m else None
+        return json.loads(m.group(0), strict=False) if m else None
     except Exception as ex:
         print(f"  (IA falló: {ex})")
         return None
@@ -390,7 +448,9 @@ def fetch_new(articles):
             if aid in known:
                 st["ya conocidas"] += 1
                 continue
-            raw = clean_summary(strip_html(it.get("desc") or it.get("content") or ""))
+            d_txt = clean_summary(strip_html(it.get("desc") or ""))
+            c_txt = clean_summary(" ".join(html_to_paragraphs(it.get("content") or "", 6000)))
+            raw = c_txt if len(c_txt) > len(d_txt) else d_txt
             hit = blocked_word(it["title"] + " " + raw[:400])
             if hit:
                 st["descartadas por palabra"] += 1
@@ -414,15 +474,18 @@ def fetch_new(articles):
             if cat not in CFG["categories"]:
                 cat = guess_category(title + " " + raw)
             image = it.get("image") or fetch_og_image(it["link"])
+            body = (html_to_paragraphs(it.get("content") or it.get("desc") or "", CFG.get("full_text_max_chars", 30000))
+                    if feed.get("full_text") else [])
             known.add(aid)
             new.append({
                 "id": aid,
                 "slug": f"{slugify(title)}-{aid}",
                 "title": title,
-                "summary": truncate(summary, CFG["summary_max_chars"]),
+                "summary": truncate_sentence(summary, CFG.get("ai_summary_max_chars", 1500) if (ai or {}).get("resumen") else CFG["summary_max_chars"]),
                 "category": cat,
                 "image": image,
                 "img_tried": True,
+                **({"body": body} if body else {}),
                 "source": feed["name"],
                 "url": it["link"],
                 "date": parse_date(it.get("date")).isoformat(),
@@ -527,13 +590,30 @@ h2.sec{margin:0 0 24px;font:800 1.7rem/1.1 var(--serif);letter-spacing:-.015em}
 .nota .media{aspect-ratio:16/9;border-radius:20px;margin:26px 0}
 .nota .stand{margin:22px 0 0;font:400 1.32rem/1.55 var(--serif);max-width:62ch}
 .nota .media + .stand{margin-top:0}
-.source-box{margin:30px 0 18px;padding:24px;border-radius:16px;background:color-mix(in srgb,var(--sun) 24%,var(--paper))}
-.source-box p{margin:0 0 14px;font-weight:500}
-.btn{display:inline-block;padding:13px 22px;border-radius:12px;background:var(--btn);color:var(--btn-ink);font:700 1rem var(--sans)}
-.btn:hover{opacity:.88}
-.actions{display:flex;gap:10px;flex-wrap:wrap}
-.actions button{padding:9px 18px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:600 .92rem var(--sans);cursor:pointer}
-.actions button:hover{border-color:var(--ink)}
+
+.nota .txt{margin-top:18px}
+.nota .txt p{margin:0 0 1.15em;font-size:1.12rem;line-height:1.75;max-width:66ch}
+.source-box{--panel:#012d5c;margin:36px 0 26px;padding:26px 28px;border-radius:20px;background:var(--panel);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap}
+@media(prefers-color-scheme:dark){.source-box{--panel:#123a6e}}
+.sb-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 280px}
+.sb-text b{font:800 1.3rem/1.2 var(--serif)}
+.sb-text span{font:600 .86rem var(--sans);color:#ffd45e}
+.sb-text p{margin:8px 0 0;font:400 .98rem/1.5 var(--sans);color:#d6e2f0;max-width:52ch}
+.sb-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;border-radius:999px;background:var(--sun);color:#012d5c;font:800 1rem var(--sans);flex:0 1 auto;max-width:100%;text-align:center}
+.sb-btn:hover{background:#ffd45e}
+.sb-btn svg{width:18px;height:18px;flex:none}
+.actions{margin:0 0 8px;display:flex;flex-direction:column;gap:12px}
+.actions[hidden],.pill[hidden]{display:none}
+.actions-title{font:700 .95rem var(--sans);color:var(--muted)}
+.actions-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:9px;padding:11px 20px;border-radius:999px;border:2px solid var(--ink);background:transparent;color:var(--ink);font:700 .95rem var(--sans);cursor:pointer}
+.pill svg,.round svg{width:20px;height:20px;flex:none}
+.pill:hover{background:var(--ink);color:var(--paper)}
+.pill.solid{background:var(--ink);color:var(--paper)}
+.pill.solid:hover{background:var(--sun);border-color:var(--sun);color:#012d5c}
+.pill.ok,.pill.solid.ok{background:#1f9d6e;border-color:#1f9d6e;color:#fff}
+.round{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%;border:2px solid var(--line);background:var(--paper);color:var(--ink)}
+.round:hover{background:var(--ink);border-color:var(--ink);color:var(--paper)}
 .related{margin:56px 0 24px}
 
 dialog.search{border:0;border-radius:20px;padding:0;width:min(660px,calc(100% - 28px));margin:9vh auto auto;background:var(--paper);color:var(--ink);overflow:hidden}
@@ -566,6 +646,8 @@ footer.site a{text-decoration:underline}
  .card .body{padding-top:0}
  .card h3{font-size:1.1rem;-webkit-line-clamp:5}
  .card p{display:none}
+ .source-box{padding:22px 20px}
+ .sb-btn{width:100%}
  .lead .media{border-radius:16px}
  .nota .media{border-radius:16px}
 }
@@ -616,25 +698,33 @@ JS = r"""
       if(grid.querySelectorAll('.more[hidden]').length===0)btn.remove();
     });
   });
-  function flash(btn,txt){var o=btn.textContent;btn.textContent=txt;setTimeout(function(){btn.textContent=o},2200)}
-  function copy(btn){
-    var url=location.href;
-    function ok(){flash(btn,'Enlace copiado')}
-    function fallback(){
-      var t=document.createElement('textarea');t.value=url;t.style.position='fixed';t.style.opacity='0';
-      document.body.appendChild(t);t.select();
-      try{if(document.execCommand('copy')){ok()}else{flash(btn,'No se pudo copiar')}}catch(e){flash(btn,'No se pudo copiar')}
-      t.remove();
+  var act=document.querySelector('.actions');
+  if(act){
+    act.hidden=false;
+    var cn=document.querySelector('link[rel=canonical]'),url=cn?cn.href:location.href,
+        title=act.getAttribute('data-title')||document.title,e=encodeURIComponent;
+    var nets={whatsapp:'https://wa.me/?text='+e(title+' '+url),
+      x:'https://x.com/intent/post?text='+e(title)+'&url='+e(url),
+      facebook:'https://www.facebook.com/sharer/sharer.php?u='+e(url),
+      mail:'mailto:?subject='+e(title)+'&body='+e(url)};
+    act.querySelectorAll('[data-net]').forEach(function(a){a.href=nets[a.getAttribute('data-net')]});
+    var sh=act.querySelector('[data-share]');
+    if(sh&&navigator.share){sh.hidden=false;sh.addEventListener('click',function(){navigator.share({title:title,url:url}).catch(function(){})})}
+    var cp=act.querySelector('[data-copy]');
+    if(cp){
+      var lbl=cp.querySelector('.lbl'),orig=lbl.textContent;
+      var done=function(ok){lbl.textContent=ok?'Enlace copiado':'No se pudo copiar';cp.classList.toggle('ok',ok);
+        setTimeout(function(){lbl.textContent=orig;cp.classList.remove('ok')},2200)};
+      var fallback=function(){var t=document.createElement('textarea');t.value=url;t.style.position='fixed';t.style.opacity='0';
+        document.body.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy')}catch(x){}t.remove();done(ok)};
+      cp.addEventListener('click',function(){
+        if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(function(){done(true)},fallback)}
+        else{fallback()}
+      });
     }
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(ok,fallback)}else{fallback()}
   }
-  document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){copy(b)})});
-  document.querySelectorAll('[data-share]').forEach(function(b){
-    b.addEventListener('click',function(){
-      if(navigator.share){navigator.share({title:b.getAttribute('data-title'),url:location.href}).catch(function(){})}
-      else{copy(b)}
-    });
-  });
+  var nav=document.querySelector('nav.cats'),cur=nav&&nav.querySelector('[aria-current]');
+  if(cur&&nav.scrollWidth>nav.clientWidth){nav.scrollLeft=cur.offsetLeft-(nav.clientWidth-cur.offsetWidth)/2}
 })();
 """
 
@@ -650,6 +740,20 @@ FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox
            "%3Ccircle cx='16' cy='16' r='11' fill='%23ffc933'/%3E%3C/svg%3E")
 SEARCH_ICON = ('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" '
                'stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>')
+
+
+def _svg(inner, fill=False):
+    a = 'fill="currentColor"' if fill else 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
+    return f'<svg viewBox="0 0 24 24" {a} aria-hidden="true">{inner}</svg>'
+
+
+ICON_EXT = _svg('<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>')
+ICON_SHARE = _svg('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>')
+ICON_LINK = _svg('<path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/>')
+ICON_MAIL = _svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>')
+ICON_X = _svg('<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>', True)
+ICON_FB = _svg('<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>', True)
+ICON_WA = _svg('<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>', True)
 
 
 def cat_cls(c):
@@ -719,7 +823,7 @@ def card(a, r, hidden=False):
     h = " hidden" if hidden else ""
     return (f'<article class="{cls}"{h}>{media(a)}<div class="body">{chip(a["category"])}'
             f'<h3><a class="stretch" href="{r}nota/{a["slug"]}.html">{esc(a["title"])}</a></h3>'
-            f'<p>{esc(a["summary"])}</p>{meta(a)}</div></article>')
+            f'<p>{esc(teaser(a, 220))}</p>{meta(a)}</div></article>')
 
 
 def river(items, r, first=18):
@@ -756,7 +860,7 @@ def render_home(arts, built):
         for a in side)
     top = (f'<section class="top{"" if side else " solo"}"><article class="lead">{media(lead, eager=True)}'
            f'<div class="body">{chip(lead["category"])}<h2><a class="stretch" href="nota/{lead["slug"]}.html">{esc(lead["title"])}</a></h2>'
-           f'<p>{esc(lead["summary"])}</p>{meta(lead)}</div></article>'
+           f'<p>{esc(teaser(lead, 260))}</p>{meta(lead)}</div></article>'
            + (f'<div class="side">{minis}</div>' if side else "") + "</section>")
     more = f'<section><h2 class="sec">Últimas historias</h2>{river(rest, "")}</section>' if rest else ""
     canon = (CFG["site_url"] + "/") if CFG["site_url"] else ""
@@ -772,16 +876,31 @@ def render_article(a, arts):
         rel_title, rel = "Sigue leyendo", [x for x in arts if x["id"] != a["id"]][:3]
     related = (f'<section class="related"><h2 class="sec">{esc(rel_title)}</h2>'
                f'<div class="grid">{"".join(card(x, "../") for x in rel)}</div></section>') if rel else ""
+    paras = paragraphs(a)
+    host = urlparse(a["url"]).netloc.removeprefix("www.")
+    text_html = f'<p class="stand">{esc(paras[0])}</p>' if paras else ""
+    if len(paras) > 1:
+        text_html += '<div class="txt">' + "".join(f"<p>{esc(x)}</p>" for x in paras[1:]) + "</div>"
+    full = bool(a.get("body"))
+    sb_text = (f"Texto publicado por {a['source']}. Visita la nota original para ver más." if full
+               else "Esto es un resumen. La historia completa, con todos sus detalles, está en la web de la fuente.")
+    sb_btn = f"Ver la nota original en {a['source']}" if full else f"Seguir leyendo en {a['source']}"
+    source_box = (f'<aside class="source-box"><div class="sb-text"><b>{esc(a["source"])}</b><span>{esc(host)}</span>'
+                  f'<p>{esc(sb_text)}</p></div><a class="sb-btn" href="{esc(a["url"])}" target="_blank" rel="noopener">'
+                  f'{esc(sb_btn)}{ICON_EXT}</a></aside>')
+    actions = (f'<div class="actions" hidden data-title="{esc(a["title"])}"><span class="actions-title">Comparte esta historia</span>'
+               f'<div class="actions-row"><button type="button" class="pill" data-share hidden>{ICON_SHARE}<span>Compartir</span></button>'
+               f'<a class="round" data-net="whatsapp" target="_blank" rel="noopener" aria-label="Compartir en WhatsApp" title="WhatsApp">{ICON_WA}</a>'
+               f'<a class="round" data-net="x" target="_blank" rel="noopener" aria-label="Compartir en X" title="X">{ICON_X}</a>'
+               f'<a class="round" data-net="facebook" target="_blank" rel="noopener" aria-label="Compartir en Facebook" title="Facebook">{ICON_FB}</a>'
+               f'<a class="round" data-net="mail" aria-label="Enviar por correo" title="Correo">{ICON_MAIL}</a>'
+               f'<button type="button" class="pill solid" data-copy>{ICON_LINK}<span class="lbl">Copiar enlace</span></button></div></div>')
     body = (f'<article class="nota"><a class="chip {cat_cls(a["category"])}" href="../categoria/{slugify(a["category"])}.html">'
             f'<i></i>{esc(a["category"])}</a><h1>{esc(a["title"])}</h1>'
             f'<div class="meta"><b>{esc(a["source"])}</b><time datetime="{esc(a["date"])}">{fmt_date(a["date"])}</time></div>'
-            f'{media(a, eager=True) if a.get("image") else ""}<p class="stand">{esc(a["summary"])}</p>'
-            f'<div class="source-box"><p>Esto es un resumen. La nota completa está en {esc(a["source"])}.</p>'
-            f'<a class="btn" href="{esc(a["url"])}" target="_blank" rel="noopener">Leer la nota completa en {esc(a["source"])}</a></div>'
-            f'<div class="actions"><button type="button" data-share data-title="{esc(a["title"])}">Compartir</button>'
-            f'<button type="button" data-copy>Copiar enlace</button></div></article>{related}')
+            f'{media(a, eager=True) if a.get("image") else ""}{text_html}{source_box}{actions}</article>{related}')
     can = f'{CFG["site_url"]}/nota/{a["slug"]}.html' if CFG["site_url"] else ""
-    return page(f'{a["title"]} | {CFG["site_name"]}', body, 1, a["summary"], a.get("image", ""), can,
+    return page(f'{a["title"]} | {CFG["site_name"]}', body, 1, teaser(a, 200), a.get("image", ""), can,
                 current=a["category"])
 
 
@@ -817,7 +936,7 @@ def build_site(arts):
     for c in CFG["categories"]:
         write(OUT / "categoria" / f"{slugify(c)}.html", render_category(c, [a for a in arts if a["category"] == c]))
     write(OUT / "search.json", json.dumps(
-        [{"t": a["title"], "s": truncate(a["summary"], 160), "c": a["category"], "u": f'nota/{a["slug"]}.html'}
+        [{"t": a["title"], "s": teaser(a, 160), "c": a["category"], "u": f'nota/{a["slug"]}.html'}
          for a in arts], ensure_ascii=False, separators=(",", ":")))
     write(OUT / "robots.txt", "User-agent: *\nAllow: /\n" + (f"Sitemap: {CFG['site_url']}/sitemap.xml\n" if CFG["site_url"] else ""))
     if CFG["site_url"]:
@@ -828,7 +947,7 @@ def build_site(arts):
               + "".join(f"<url><loc>{esc(x)}</loc></url>" for x in urls) + "</urlset>")
         items = "".join(
             f"<item><title>{esc(a['title'])}</title><link>{esc(u)}/nota/{a['slug']}.html</link>"
-            f"<guid>{esc(u)}/nota/{a['slug']}.html</guid><description>{esc(a['summary'])}</description>"
+            f"<guid>{esc(u)}/nota/{a['slug']}.html</guid><description>{esc(teaser(a, 400))}</description>"
             f"<pubDate>{parse_date(a['date']).strftime('%a, %d %b %Y %H:%M:%S +0000')}</pubDate></item>"
             for a in arts[:30])
         write(OUT / "feed.xml", f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>{esc(CFG["site_name"])}</title>'

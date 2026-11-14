@@ -37,3 +37,13 @@ Todo está en `config.json`: nombre, categorías, feeds, palabras bloqueadas, no
 - Verifica las URLs de los feeds; si una fuente cambia su RSS, el script la omite y sigue con las demás.
 - Sin API key el sitio funciona, pero mostrará títulos y resúmenes en el idioma original (inglés) y el filtro será solo por palabras.
 - Revisa los términos de uso de cada fuente; el diseño usa solo titular + resumen corto + enlace.
+
+## Marca y logo
+
+Los archivos de `assets/` (logo claro y oscuro, favicon, imagen para compartir) se copian solos a la web publicada. Si borras `assets/logo.png`, la cabecera muestra el nombre del sitio en texto. La paleta y el uso del logo están en `BRAND.md`.
+
+## Longitud del texto de cada nota
+
+- `summary_max_chars` (700): extracto de la fuente que se muestra en la nota.
+- `ai_summary_max_chars` (1500): longitud máxima del resumen escrito por Claude con sus propias palabras (solo si se usa la IA; para fuentes en español, `"ai_for_spanish": true`).
+- `"full_text": true` en un feed: publica el texto completo de esa fuente. Actívalo solo si la fuente lo permite (licencia Creative Commons o permiso expreso). Por defecto está desactivado en todas.
