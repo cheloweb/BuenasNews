@@ -599,6 +599,7 @@ h2.sec{margin:0 0 24px;font:800 1.7rem/1.1 var(--serif);letter-spacing:-.015em}
 .sb-btn svg{width:18px;height:18px;flex:none}
 .actions{margin:0;display:flex}
 .actions[hidden],.round[hidden]{display:none}
+.more[hidden]{display:none!important}
 .actions-title{font:700 .95rem var(--sans);color:var(--muted)}
 .actions-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
 .round svg{width:20px;height:20px;flex:none}
