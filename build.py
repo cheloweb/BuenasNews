@@ -650,6 +650,50 @@ footer.site a{text-decoration:underline}
  .lead .media{border-radius:16px}
  .nota .media{border-radius:16px}
 }
+.st-open{display:inline-flex;align-items:center;gap:8px;padding:5px 14px 5px 6px;border-radius:999px;border:0;background:var(--ink);color:var(--paper);font:700 .88rem var(--sans);cursor:pointer}
+.st-open[hidden]{display:none}
+.st-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;display:inline-flex;align-items:center;gap:8px;padding:8px 18px 8px 8px;border-radius:999px;border:0;background:var(--ink);color:var(--paper);font:800 .95rem var(--sans);cursor:pointer;box-shadow:0 6px 20px rgba(1,45,92,.35)}
+.st-fab[hidden]{display:none}
+.st-fab i{width:28px;height:28px;border-radius:50%;background:var(--sun);display:block;box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--sun)}
+.st-fab:hover{background:var(--sun);color:#012d5c}
+.st-open i{width:22px;height:22px;border-radius:50%;background:var(--sun);display:block;box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--sun)}
+.st-open:hover{background:var(--sun);color:#012d5c}
+body:has(dialog.stories[open]){overflow:hidden}
+dialog.stories{border:0;padding:0;margin:auto;max-width:440px;background:#00162e;color:#fff;overflow:hidden;border-radius:26px;
+ width:min(calc(100vw - 14px),440px);height:calc(100vh - 14px);height:calc(100dvh - 14px);max-height:900px}
+dialog.stories::backdrop{background:rgba(3,10,22,.8)}
+.st-card{position:absolute;inset:0;--c:#5b6b7d;--dur:6s;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+ background:linear-gradient(165deg,color-mix(in srgb,var(--c) 55%,#012d5c),#012d5c)}
+.st-card::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.14) 1.5px,transparent 1.7px);background-size:14px 14px}
+.st-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;-webkit-user-drag:none}
+.st-scrim{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,12,28,.6) 0,rgba(0,12,28,0) 22%,rgba(0,12,28,0) 36%,rgba(0,12,28,.92) 100%)}
+.zone{position:absolute;top:0;bottom:0;z-index:2;border:0;background:transparent;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.zone.prev{left:0;width:35%}
+.zone.next{right:0;width:65%}
+.st-top{position:absolute;left:0;right:0;top:0;padding:12px 14px 0;z-index:4;pointer-events:none}
+.st-bars{display:flex;gap:4px}
+.st-bars i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.35);overflow:hidden;display:block}
+.st-bars b{display:block;height:100%;width:0;background:#fff}
+.st-bars .done b{width:100%}
+.st-bars .active b{animation:st-fill var(--dur) linear forwards}
+.st-card.paused .st-bars .active b{animation-play-state:paused}
+@keyframes st-fill{from{width:0}to{width:100%}}
+.st-head{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.st-brand{display:flex;align-items:center;gap:8px;font:700 .92rem var(--sans);text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.st-brand i{width:20px;height:20px;border-radius:50%;background:var(--sun);display:block}
+.st-close{pointer-events:auto;width:42px;height:42px;border-radius:50%;border:0;background:rgba(0,12,28,.5);color:#fff;display:grid;place-items:center;cursor:pointer}
+.st-close svg{width:22px;height:22px}
+.st-close:hover{background:rgba(0,12,28,.8)}
+.st-body{position:absolute;left:0;right:0;bottom:0;padding:0 22px 24px;z-index:3;display:flex;flex-direction:column;gap:12px;pointer-events:none}
+.st-chip{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:6px 13px;border-radius:999px;background:rgba(0,12,28,.55);font:700 .86rem var(--sans)}
+.st-chip i{width:9px;height:9px;border-radius:50%;background:var(--c);display:block}
+.st-title{margin:0;font:800 clamp(1.55rem,5.8vw,2.05rem)/1.1 var(--serif);letter-spacing:-.015em;text-shadow:0 1px 10px rgba(0,0,0,.35)}
+.st-sum{margin:0;font:400 1rem/1.45 var(--sans);color:#e3ebf5;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.st-meta{font:600 .84rem var(--sans);color:#c4d3e5}
+.st-cta{pointer-events:auto;display:flex;align-items:center;justify-content:center;gap:10px;padding:15px 22px;border-radius:999px;background:var(--sun);color:#012d5c;font:800 1.02rem var(--sans)}
+.st-cta:hover{background:#ffd45e}
+.st-cta svg{width:18px;height:18px}
+@media(prefers-reduced-motion:reduce){.st-bars .active b{animation:none;width:100%}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 """
 
@@ -688,7 +732,7 @@ JS = r"""
   document.addEventListener('keydown',function(e){
     var t=e.target&&e.target.tagName;
     if(e.key==='Escape'&&dlg&&dlg.open){dlg.close();return}
-    if(e.key==='/'&&t!=='INPUT'&&t!=='TEXTAREA'){e.preventDefault();open()}
+    if(e.key==='/'&&t!=='INPUT'&&t!=='TEXTAREA'&&!document.querySelector('dialog[open]')){e.preventDefault();open()}
   });
   document.querySelectorAll('[data-more]').forEach(function(btn){
     btn.addEventListener('click',function(){
@@ -722,6 +766,66 @@ JS = r"""
   }
   var nav=document.querySelector('nav.cats'),cur=nav&&nav.querySelector('[aria-current]');
   if(cur&&nav.scrollWidth>nav.clientWidth){nav.scrollLeft=cur.offsetLeft-(nav.clientWidth-cur.offsetWidth)/2}
+})();
+(function(){
+  var sd=document.getElementById('stories'),dataEl=document.getElementById('stories-data');
+  if(!sd||!dataEl||typeof sd.showModal!=='function')return;
+  var data=[];try{data=JSON.parse(dataEl.textContent)}catch(x){}
+  if(!data.length)return;
+  var root=document.documentElement.getAttribute('data-root')||'';
+  var card=sd.querySelector('.st-card'),bars=sd.querySelector('.st-bars'),scrim=sd.querySelector('.st-scrim'),
+      idx=0,paused=false,suppress=false,holdT=null;
+  card.style.setProperty('--dur',(parseFloat(sd.getAttribute('data-dur'))||6)+'s');
+  function q(s){return sd.querySelector(s)}
+  function build(){bars.textContent='';data.forEach(function(){var i=document.createElement('i');i.appendChild(document.createElement('b'));bars.appendChild(i)})}
+  function setPaused(p){paused=p;card.classList.toggle('paused',p)}
+  function show(n){
+    idx=n;var s=data[n];setPaused(false);
+    for(var i=0;i<bars.children.length;i++){bars.children[i].className=i<n?'done':(i===n?'active':'')}
+    card.style.setProperty('--c',s.c);
+    var old=card.querySelector('img');if(old)old.remove();
+    if(s.i){var im=document.createElement('img');im.alt='';im.referrerPolicy='no-referrer';
+      im.onerror=function(){im.remove()};im.onload=function(){if(im.naturalWidth<60)im.remove()};
+      im.src=s.i;card.insertBefore(im,scrim)}
+    q('.st-k').textContent=s.k;q('.st-title').textContent=s.t;q('.st-sum').textContent=s.s;
+    q('.st-meta').textContent=s.m+', '+s.d;q('.st-cta').href=root+s.u;
+    var nx=data[n+1];if(nx&&nx.i){var pl=new Image();pl.referrerPolicy='no-referrer';pl.src=nx.i}
+  }
+  function close(){if(sd.open)sd.close()}
+  function next(){if(idx<data.length-1){show(idx+1)}else{close()}}
+  function prev(){show(idx>0?idx-1:0)}
+  function open(){
+    build();show(0);sd.showModal();q('.st-close').focus();
+    try{sessionStorage.setItem('stories-seen','1')}catch(e){}
+  }
+  bars.addEventListener('animationend',function(e){if(e.target.parentNode.className==='active')next()});
+  [['.zone.prev',prev],['.zone.next',next]].forEach(function(z){
+    var el=q(z[0]);
+    var end=function(){clearTimeout(holdT);if(paused){setPaused(false);suppress=true;setTimeout(function(){suppress=false},60)}};
+    el.addEventListener('pointerdown',function(){clearTimeout(holdT);holdT=setTimeout(function(){setPaused(true)},220)});
+    el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);el.addEventListener('pointerleave',end);
+    el.addEventListener('click',function(){if(!suppress)z[1]()});
+  });
+  q('.st-close').addEventListener('click',close);
+  sd.addEventListener('click',function(e){if(e.target===sd)close()});
+  sd.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'){e.preventDefault();next()}else if(e.key==='ArrowLeft'){e.preventDefault();prev()}
+  });
+  sd.addEventListener('close',function(){setPaused(false);bars.textContent=''});
+  document.querySelectorAll('[data-stories-open]').forEach(function(b){b.hidden=false;b.addEventListener('click',open)});
+  var once=sd.getAttribute('data-once')==='1',seen=false;
+  try{seen=sessionStorage.getItem('stories-seen')==='1'}catch(e){}
+  if(!(once&&seen)){
+    var delay=(parseFloat(sd.getAttribute('data-delay'))||10)*1000;
+    var tryOpen=function(){
+      if(document.hidden){
+        document.addEventListener('visibilitychange',function f(){if(!document.hidden){document.removeEventListener('visibilitychange',f);tryOpen()}});
+        return;
+      }
+      if(!document.querySelector('dialog[open]'))open();
+    };
+    setTimeout(tryOpen,delay);
+  }
 })();
 """
 
@@ -771,7 +875,7 @@ def media(a, eager=False):
     return f'<div class="media {cat_cls(a["category"])}">{img}</div>'
 
 
-def page(title, body, depth, desc="", og_image="", canonical="", current=None):
+def page(title, body, depth, desc="", og_image="", canonical="", current=None, extra=""):
     r = "../" * depth
     items = [f'<a href="{r}index.html"' + (' aria-current="page"' if current == "home" else "") + ">Portada</a>"]
     for c in CFG["categories"]:
@@ -810,7 +914,7 @@ def page(title, body, depth, desc="", og_image="", canonical="", current=None):
 <footer class="site"><div class="wrap"><p><strong>{esc(CFG['site_name'])}</strong> reúne noticias positivas de medios de todo el mundo. Cada historia es un resumen que enlaza a la fuente original.{rss}</p>
 <p>© {datetime.now().year}</p></div></footer>
 <dialog id="search" class="search" aria-label="Buscar historias"><div class="srow"><input id="q" type="search" placeholder="Buscar historias" autocomplete="off" aria-label="Buscar historias"><button type="button" data-close>Cerrar</button></div><div id="results" aria-live="polite"></div></dialog>
-<script src="{r}app.js" defer></script></body></html>"""
+{extra}<script src="{r}app.js" defer></script></body></html>"""
 
 
 def card(a, r, hidden=False):
@@ -827,6 +931,43 @@ def river(items, r, first=18):
     return f'<div class="grid">{cards}</div>{btn}'
 
 
+ICON_CLOSE = _svg('<path d="M6 6l12 12M18 6 6 18"/>')
+
+
+def stories_cfg():
+    c = {"enabled": True, "delay_seconds": 10, "count": 8, "seconds_per_story": 6, "once_per_session": True}
+    c.update(CFG.get("stories", {}))
+    return c
+
+
+def cat_color(c):
+    cats = CFG["categories"]
+    return PALETTE[cats.index(c) % len(PALETTE)] if c in cats else PALETTE[-1]
+
+
+def stories_markup(arts):
+    cfg = stories_cfg()
+    items = arts[: int(cfg["count"])]
+    if not cfg["enabled"] or len(items) < 2:
+        return ""
+    data = [{"t": a["title"], "s": teaser(a, 200), "k": a["category"], "c": cat_color(a["category"]),
+             "i": a.get("image", ""), "u": f'nota/{a["slug"]}.html', "m": a["source"], "d": short_date(a["date"])}
+            for a in items]
+    blob = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
+    return (f'<script type="application/json" id="stories-data">{blob}</script>'
+            f'<dialog id="stories" class="stories" aria-label="Historias del día" data-delay="{cfg["delay_seconds"]}" '
+            f'data-dur="{cfg["seconds_per_story"]}" data-once="{1 if cfg["once_per_session"] else 0}">'
+            '<div class="st-card"><div class="st-scrim"></div>'
+            '<button class="zone prev" type="button" aria-label="Historia anterior"></button>'
+            '<button class="zone next" type="button" aria-label="Siguiente historia"></button>'
+            f'<div class="st-top"><div class="st-bars"></div><div class="st-head"><span class="st-brand"><i></i>{esc(CFG["site_name"])}</span>'
+            f'<button class="st-close" type="button" aria-label="Cerrar historias">{ICON_CLOSE}</button></div></div>'
+            '<div class="st-body" aria-live="polite"><span class="st-chip"><i></i><span class="st-k"></span></span>'
+            '<h2 class="st-title"></h2><p class="st-sum"></p><div class="st-meta"></div>'
+            f'<a class="st-cta" href="#">Leer la nota{ICON_EXT}</a></div></div></dialog>'
+            '<button type="button" class="st-fab" data-stories-open hidden><i></i>Historias</button>')
+
+
 def today_line(arts, built):
     fecha = f"{DIAS[built.weekday()].capitalize()} {built.day} de {MESES[built.month - 1]}"
     tz = site_tz()
@@ -838,6 +979,8 @@ def today_line(arts, built):
         except Exception:
             pass
     parts = [f"<strong>{fecha}</strong>", f"Actualizado a las {built.strftime('%H:%M')}"]
+    if stories_markup(arts):
+        parts.append('<button type="button" class="st-open" data-stories-open hidden><i></i>Ver historias</button>')
     if n:
         parts.append(f"{n} historia nueva hoy" if n == 1 else f"{n} historias nuevas hoy")
     return '<div class="today">' + "".join(f"<span>{p}</span>" for p in parts) + "</div>"
@@ -860,7 +1003,7 @@ def render_home(arts, built):
     more = f'<section><h2 class="sec">Últimas historias</h2>{river(rest, "")}</section>' if rest else ""
     canon = (CFG["site_url"] + "/") if CFG["site_url"] else ""
     return page(f"{CFG['site_name']}: {CFG['tagline']}", today_line(arts, built) + top + more, 0,
-                og_image=lead.get("image", ""), canonical=canon, current="home")
+                og_image=lead.get("image", ""), canonical=canon, current="home", extra=stories_markup(arts))
 
 
 def render_article(a, arts):

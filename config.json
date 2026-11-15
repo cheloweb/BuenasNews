@@ -8,6 +8,7 @@
   "summary_max_chars": 700,
   "ai_summary_max_chars": 1500,
   "full_text_max_chars": 30000,
+  "stories": {"enabled": true, "delay_seconds": 10, "count": 8, "seconds_per_story": 6, "once_per_session": true},
   "ai_model": "claude-haiku-5-5",
   "ai_for_spanish": false,
   "categories": [

@@ -47,3 +47,7 @@ Los archivos de `assets/` (logo claro y oscuro, favicon, imagen para compartir) 
 - `summary_max_chars` (700): extracto de la fuente que se muestra en la nota.
 - `ai_summary_max_chars` (1500): longitud máxima del resumen escrito por Claude con sus propias palabras (solo si se usa la IA; para fuentes en español, `"ai_for_spanish": true`).
 - `"full_text": true` en un feed: publica el texto completo de esa fuente. Actívalo solo si la fuente lo permite (licencia Creative Commons o permiso expreso). Por defecto está desactivado en todas.
+
+## Modo historias
+
+A los 10 segundos de abrir la portada aparece un modal tipo historias de Instagram con las últimas notas. Toca la derecha para avanzar y la izquierda para volver; mantener pulsado pausa; la X lo cierra y vuelve al portal. Hay un botón "Ver historias" para reabrirlo. Se ajusta en `config.json`, bloque `stories`: `enabled`, `delay_seconds`, `count` (número de historias), `seconds_per_story` y `once_per_session` (si es `true`, no se vuelve a abrir solo en la misma sesión del navegador).
