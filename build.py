@@ -593,16 +593,11 @@ h2.sec{margin:0 0 24px;font:800 1.7rem/1.1 var(--serif);letter-spacing:-.015em}
 
 .nota .txt{margin-top:18px}
 .nota .txt p{margin:0 0 1.15em;font-size:1.12rem;line-height:1.75;max-width:66ch}
-.source-box{--panel:#012d5c;margin:36px 0 26px;padding:26px 28px;border-radius:20px;background:var(--panel);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap}
-@media(prefers-color-scheme:dark){.source-box{--panel:#123a6e}}
-.sb-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 280px}
-.sb-text b{font:800 1.3rem/1.2 var(--serif)}
-.sb-text span{font:600 .86rem var(--sans);color:#ffd45e}
-.sb-text p{margin:8px 0 0;font:400 .98rem/1.5 var(--sans);color:#d6e2f0;max-width:52ch}
-.sb-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;border-radius:999px;background:var(--sun);color:#012d5c;font:800 1rem var(--sans);flex:0 1 auto;max-width:100%;text-align:center}
+.note-bar{margin:34px 0 8px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 20px}
+.sb-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:11px 20px;border-radius:999px;background:var(--sun);color:#012d5c;font:800 .95rem var(--sans);flex:0 1 auto;max-width:100%;text-align:center}
 .sb-btn:hover{background:#ffd45e}
 .sb-btn svg{width:18px;height:18px;flex:none}
-.actions{margin:0 0 8px;display:flex;flex-direction:column;gap:12px}
+.actions{margin:0;display:flex}
 .actions[hidden],.round[hidden]{display:none}
 .actions-title{font:700 .95rem var(--sans);color:var(--muted)}
 .actions-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
@@ -645,7 +640,6 @@ footer.site a{text-decoration:underline}
  .card .body{padding-top:0}
  .card h3{font-size:1.1rem;-webkit-line-clamp:5}
  .card p{display:none}
- .source-box{padding:22px 20px}
  .sb-btn{width:100%}
  .lead .media{border-radius:16px}
  .nota .media{border-radius:16px}
@@ -737,7 +731,7 @@ JS = r"""
   document.querySelectorAll('[data-more]').forEach(function(btn){
     btn.addEventListener('click',function(){
       var grid=btn.previousElementSibling,hid=grid.querySelectorAll('.more[hidden]');
-      for(var i=0;i<hid.length&&i<18;i++){hid[i].hidden=false}
+      var n=parseInt(btn.getAttribute('data-batch'),10)||12;for(var i=0;i<hid.length&&i<n;i++){hid[i].hidden=false}
       if(grid.querySelectorAll('.more[hidden]').length===0)btn.remove();
     });
   });
@@ -912,6 +906,7 @@ def page(title, body, depth, desc="", og_image="", canonical="", current=None, e
 <button class="search-btn" type="button" data-search aria-label="Buscar historias">{SEARCH_ICON}<span>Buscar</span></button></div></div>
 <main class="wrap">{body}</main>
 <footer class="site"><div class="wrap"><p><strong>{esc(CFG['site_name'])}</strong> reúne noticias positivas de medios de todo el mundo. Cada historia es un resumen que enlaza a la fuente original.{rss}</p>
+<p class="disclaimer">Las noticias que aparecen aquí son de medios externos. {esc(CFG['site_name'])} es solo una recopilación de noticias positivas y no se hace responsable del contenido de las mismas: la responsabilidad es de cada fuente. Para ver la nota completa, visita el sitio original.</p>
 <p>© {datetime.now().year}</p></div></footer>
 <dialog id="search" class="search" aria-label="Buscar historias"><div class="srow"><input id="q" type="search" placeholder="Buscar historias" autocomplete="off" aria-label="Buscar historias"><button type="button" data-close>Cerrar</button></div><div id="results" aria-live="polite"></div></dialog>
 {extra}<script src="{r}app.js" defer></script></body></html>"""
@@ -925,9 +920,9 @@ def card(a, r, hidden=False):
             f'<p>{esc(teaser(a, 220))}</p>{meta(a)}</div></article>')
 
 
-def river(items, r, first=18):
+def river(items, r, first=18, batch=12):
     cards = "".join(card(a, r, hidden=i >= first) for i, a in enumerate(items))
-    btn = '<button class="more-btn" type="button" data-more>Mostrar más historias</button>' if len(items) > first else ""
+    btn = f'<button class="more-btn" type="button" data-more data-batch="{batch}">Cargar más historias</button>' if len(items) > first else ""
     return f'<div class="grid">{cards}</div>{btn}'
 
 
@@ -996,7 +991,7 @@ def render_home(arts, built):
            f'<div class="body">{chip(lead["category"])}<h2><a class="stretch" href="nota/{lead["slug"]}.html">{esc(lead["title"])}</a></h2>'
            f'<p>{esc(teaser(lead, 260))}</p>{meta(lead)}</div></article>'
            + (f'<div class="side">{minis}</div>' if side else "") + "</section>")
-    more = f'<section><h2 class="sec">Últimas historias</h2>{river(rest, "")}</section>' if rest else ""
+    more = f'<section><h2 class="sec">Últimas historias</h2>{river(rest, "", first=max(int(CFG.get("home_initial", 30)) - 5, 0))}</section>' if rest else ""
     canon = (CFG["site_url"] + "/") if CFG["site_url"] else ""
     return page(f"{CFG['site_name']}: {CFG['tagline']}", today_line(arts, built) + top + more, 0,
                 og_image=lead.get("image", ""), canonical=canon, current="home", extra=stories_markup(arts))
@@ -1016,13 +1011,9 @@ def render_article(a, arts):
     if len(paras) > 1:
         text_html += '<div class="txt">' + "".join(f"<p>{esc(x)}</p>" for x in paras[1:]) + "</div>"
     full = bool(a.get("body"))
-    sb_text = (f"Texto publicado por {a['source']}. Visita la nota original para ver más." if full
-               else "Esto es un resumen. La historia completa, con todos sus detalles, está en la web de la fuente.")
-    sb_btn = f"Ver la nota original en {a['source']}" if full else f"Seguir leyendo en {a['source']}"
-    source_box = (f'<aside class="source-box"><div class="sb-text"><b>{esc(a["source"])}</b><span>{esc(host)}</span>'
-                  f'<p>{esc(sb_text)}</p></div><a class="sb-btn" href="{esc(a["url"])}" target="_blank" rel="noopener">'
-                  f'{esc(sb_btn)}{ICON_EXT}</a></aside>')
-    actions = (f'<div class="actions" hidden data-title="{esc(a["title"])}"><span class="actions-title">Comparte esta historia</span>'
+    sb_btn = f"Ver nota original en {a['source']}" if bool(a.get("body")) else f"Seguir leyendo en {a['source']}"
+    source_box = (f'<a class="sb-btn" href="{esc(a["url"])}" target="_blank" rel="noopener">{esc(sb_btn)}{ICON_EXT}</a>')
+    actions = (f'<div class="actions" hidden data-title="{esc(a["title"])}">'
                f'<div class="actions-row"><button type="button" class="round" data-share hidden aria-label="Compartir" title="Compartir">{ICON_SHARE}</button>'
                f'<a class="round" data-net="whatsapp" target="_blank" rel="noopener" aria-label="Compartir en WhatsApp" title="WhatsApp">{ICON_WA}</a>'
                f'<a class="round" data-net="x" target="_blank" rel="noopener" aria-label="Compartir en X" title="X">{ICON_X}</a>'
@@ -1031,7 +1022,7 @@ def render_article(a, arts):
     body = (f'<article class="nota"><a class="chip {cat_cls(a["category"])}" href="../categoria/{slugify(a["category"])}.html">'
             f'<i></i>{esc(a["category"])}</a><h1>{esc(a["title"])}</h1>'
             f'<div class="meta"><b>{esc(a["source"])}</b><time datetime="{esc(a["date"])}">{fmt_date(a["date"])}</time></div>'
-            f'{media(a, eager=True) if a.get("image") else ""}{text_html}{source_box}{actions}</article>{related}')
+            f'{media(a, eager=True) if a.get("image") else ""}{text_html}<div class="note-bar">{source_box}{actions}</div></article>{related}')
     can = f'{CFG["site_url"]}/nota/{a["slug"]}.html' if CFG["site_url"] else ""
     return page(f'{a["title"]} | {CFG["site_name"]}', body, 1, teaser(a, 200), a.get("image", ""), can,
                 current=a["category"])
