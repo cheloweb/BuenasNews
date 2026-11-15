@@ -979,10 +979,6 @@ def today_line(arts, built):
         except Exception:
             pass
     parts = [f"<strong>{fecha}</strong>", f"Actualizado a las {built.strftime('%H:%M')}"]
-    if stories_markup(arts):
-        parts.append('<button type="button" class="st-open" data-stories-open hidden><i></i>Ver historias</button>')
-    if n:
-        parts.append(f"{n} historia nueva hoy" if n == 1 else f"{n} historias nuevas hoy")
     return '<div class="today">' + "".join(f"<span>{p}</span>" for p in parts) + "</div>"
 
 
