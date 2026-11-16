@@ -1,4 +1,4 @@
-# Buenas Noticias — portal de noticias positivas autoactualizable
+# Buenas News — portal de noticias positivas autoactualizable
 
 Sitio estático generado con Python (solo librería estándar, sin dependencias).
 Cada 3 horas un workflow de GitHub Actions:

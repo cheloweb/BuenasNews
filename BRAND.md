@@ -1,6 +1,6 @@
-# Guía de marca: El Positivo
+# Guía de marca: Buenas News
 
-Lema: **Noticias que inspiran**. Los colores salen del logo (azul marino y amarillo sol); todo lo demás está pensado para no competir con ellos.
+Lema: **Noticias que inspiran**. Los colores salen del logo (azul marino `#012D5C` y amarillo sol `#FEBD06`, con el rayo central en `#FEAB03`); todo lo demás está pensado para no competir con ellos.
 
 ## Color
 
@@ -22,8 +22,8 @@ Si una nota no trae imagen, su hueco se rellena con una trama de puntos del colo
 
 ## Logo
 
-- `assets/logo.png`: para fondos claros. `assets/logo-dark.png`: versión con "El Positivo" en azul hielo para fondos oscuros; el sitio cambia solo según el modo del sistema.
-- Altura mínima en pantalla: 52 px (el lema deja de leerse por debajo).
+- `assets/logo.png`: para fondos claros. `assets/logo-dark.png`: versión con "Buenas News" y el lema en azul hielo para fondos oscuros; el sitio cambia solo según el modo del sistema.
+- Altura mínima en pantalla: 56 px (el lema deja de leerse por debajo).
 - Deja alrededor un espacio libre igual a la altura de la letra "E".
 - No lo deformes, no lo recolorees y no lo pongas sobre fotos o fondos con ruido.
 - `assets/favicon.png` y `assets/apple-touch-icon.png`: solo el sol. `assets/og-default.png` (1200×630): imagen que aparece al compartir enlaces sin foto propia.
@@ -35,4 +35,4 @@ Si una nota no trae imagen, su hueco se rellena con una trama de puntos del colo
 
 ## Tono
 
-Concreto y sereno. Titulares que cuentan qué pasó y qué mejoró, sin exclamaciones ni sensacionalismo. Cada nota resume y enlaza a la fuente original.
+Concreto y sereno. Titulares que cuentan qué pasó y qué mejoró, sin exclamaciones ni sensacionalismo. Cada nota resume y enlaza a la fuente original. El nombre mezcla español e inglés a propósito: "Buenas" (cercano, cotidiano) y "News" (global); se escribe siempre con las dos palabras en mayúscula inicial, nunca "BuenasNews" ni "Buenas noticias".
