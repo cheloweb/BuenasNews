@@ -1,7 +1,7 @@
 # Buenas News — portal de noticias positivas autoactualizable
 
 Sitio estático generado con Python (solo librería estándar, sin dependencias).
-Cada 3 horas un workflow de GitHub Actions:
+Cada hora un workflow de GitHub Actions:
 
 1. Lee los feeds RSS de `config.json` (fuentes especializadas en noticias positivas).
 2. Descarta notas con palabras negativas (`blocklist`).
