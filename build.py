@@ -42,6 +42,16 @@ PALETTE = ["#4f5bd5", "#e0525a", "#1f9d6e", "#e08a00", "#0891b2", "#c47f2a", "#9
 
 
 # ---------------------------------------------------------------- utilidades
+def safe_url(u):
+    """Solo acepta enlaces http(s) con dominio; descarta javascript:, file:, data:, etc."""
+    u = (u or "").strip()
+    try:
+        p = urlparse(u)
+    except ValueError:
+        return ""
+    return u if p.scheme in ("http", "https") and p.netloc else ""
+
+
 def esc(s):
     return html.escape(s or "", quote=True)
 
@@ -222,6 +232,8 @@ def fetch_og_image(url):
     """Respaldo: lee la página de la nota y toma su imagen social (og:image)."""
     if not CFG.get("fetch_page_images", True):
         return ""
+    if not safe_url(url):
+        return ""
     try:
         req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html,*/*;q=0.5"})
         with urllib.request.urlopen(req, timeout=12) as r:
@@ -257,6 +269,8 @@ def backfill_images(arts, limit=12):
 
 # ---------------------------------------------------------------- ingesta
 def http_get(url, timeout=25):
+    if not safe_url(url):
+        raise ValueError("URL no permitida (solo http/https)")
     req = urllib.request.Request(url, headers={
         "User-Agent": UA,
         "Accept": "application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.5",
@@ -487,7 +501,7 @@ def fetch_new(articles):
                 "img_tried": True,
                 **({"body": body} if body else {}),
                 "source": feed["name"],
-                "url": it["link"],
+                "url": safe_url(it["link"]),
                 "date": parse_date(it.get("date")).isoformat(),
             })
             st["nuevas"] += 1
@@ -694,6 +708,12 @@ dialog.stories::backdrop{background:rgba(3,10,22,.8)}
 
 JS = r"""
 (function(){
+  document.querySelectorAll('img[referrerpolicy]').forEach(function(i){
+    if(i.complete&&i.naturalWidth<60)i.remove();
+    else{i.addEventListener('error',function(){i.remove()});i.addEventListener('load',function(){if(i.naturalWidth<60)i.remove()})}
+  });
+})();
+(function(){
   var root=document.documentElement.getAttribute('data-root')||'';
   var dlg=document.getElementById('search'),input=document.getElementById('q'),out=document.getElementById('results'),idx=null;
   function norm(s){return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}
@@ -866,8 +886,14 @@ def media(a, eager=False):
     img = ""
     if a.get("image"):
         img = (f'<img src="{esc(a["image"])}" alt="" loading="{"eager" if eager else "lazy"}" decoding="async" '
-               f'referrerpolicy="no-referrer" onerror="this.remove()" onload="if(this.naturalWidth<60)this.remove()">')
+               f'referrerpolicy="no-referrer">')
     return f'<div class="media {cat_cls(a["category"])}">{img}</div>'
+
+
+def analytics_cfg():
+    """GoatCounter: 'analytics': {'goatcounter': 'codigo'} en config.json. Solo acepta un subdominio válido."""
+    code = str((CFG.get("analytics") or {}).get("goatcounter", "")).strip().lower()
+    return code if re.fullmatch(r"[a-z0-9][a-z0-9-]{0,40}", code) else ""
 
 
 def page(title, body, depth, desc="", og_image="", canonical="", current=None, extra=""):
@@ -896,8 +922,14 @@ def page(title, body, depth, desc="", og_image="", canonical="", current=None, e
             if CFG["site_url"] else "")
     rss = f' <a href="{r}feed.xml">Suscríbete por RSS</a>.' if CFG["site_url"] else ""
     d = esc(desc or CFG["tagline"])
+    gc = analytics_cfg()
+    gc_src = " https://gc.zgo.at" if gc else ""
+    gc_conn = f" https://{gc}.goatcounter.com" if gc else ""
+    gc_tag = (f'<script data-goatcounter="https://{gc}.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>' if gc else "")
     return f"""<!doctype html><html lang="{CFG['language']}" data-root="{r}"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#012d5c">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'{gc_src}; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; connect-src 'self'{gc_conn}; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>{esc(title)}</title><meta name="description" content="{d}">
 <meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{d}"><meta property="og:type" content="website">
 {og}{can}{feed}{icons}<link rel="stylesheet" href="{r}style.css">
@@ -910,7 +942,7 @@ def page(title, body, depth, desc="", og_image="", canonical="", current=None, e
 <p class="disclaimer">Las noticias que aparecen aquí son de medios externos. {esc(CFG['site_name'])} es solo una recopilación de noticias positivas y no se hace responsable del contenido de las mismas: la responsabilidad es de cada fuente. Para ver la nota completa, visita el sitio original.</p>
 <p>© {datetime.now().year}</p></div></footer>
 <dialog id="search" class="search" aria-label="Buscar historias"><div class="srow"><input id="q" type="search" placeholder="Buscar historias" autocomplete="off" aria-label="Buscar historias"><button type="button" data-close>Cerrar</button></div><div id="results" aria-live="polite"></div></dialog>
-{extra}<script src="{r}app.js" defer></script></body></html>"""
+{extra}<script src="{r}app.js" defer></script>{gc_tag}</body></html>"""
 
 
 def card(a, r, hidden=False):
@@ -1013,7 +1045,7 @@ def render_article(a, arts):
         text_html += '<div class="txt">' + "".join(f"<p>{esc(x)}</p>" for x in paras[1:]) + "</div>"
     full = bool(a.get("body"))
     sb_btn = f"Ver nota original en {a['source']}" if bool(a.get("body")) else f"Seguir leyendo en {a['source']}"
-    source_box = (f'<a class="sb-btn" href="{esc(a["url"])}" target="_blank" rel="noopener">{esc(sb_btn)}{ICON_EXT}</a>')
+    source_box = (f'<a class="sb-btn" href="{esc(safe_url(a["url"]) or "#")}" target="_blank" rel="noopener">{esc(sb_btn)}{ICON_EXT}</a>')
     actions = (f'<div class="actions" hidden data-title="{esc(a["title"])}">'
                f'<div class="actions-row"><button type="button" class="round" data-share hidden aria-label="Compartir" title="Compartir">{ICON_SHARE}</button>'
                f'<a class="round" data-net="whatsapp" target="_blank" rel="noopener" aria-label="Compartir en WhatsApp" title="WhatsApp">{ICON_WA}</a>'
@@ -1090,13 +1122,19 @@ def main():
     if "--no-fetch" not in sys.argv:
         new_arts = fetch_new(arts)
         arts = new_arts + arts
-        backfill_images(arts)
+        backfill_images(arts, limit=max(40, CFG["max_new_per_run"] + 10))
         print(f"Notas nuevas: {len(new_arts)}. Total: {len(arts)}")
     arts.sort(key=lambda a: a["date"], reverse=True)
-    arts = arts[: CFG["max_articles"]]
-    write(DATA_FILE, json.dumps(arts, ensure_ascii=False, indent=1))
-    build_site(arts)
-    print(f"Sitio generado en {OUT}/ con {len(arts)} notas.")
+    # Solo se publican notas con imagen. Las que no la tienen se guardan (sin mostrarse)
+    # para no volver a descargarlas y volver a descartarlas en cada ejecución.
+    shown = [a for a in arts if a.get("image")][: CFG["max_articles"]]
+    hidden = [a for a in arts if not a.get("image")][:300]
+    pending = sum(1 for a in hidden if not a.get("img_tried"))
+    stored = sorted(shown + hidden, key=lambda a: a["date"], reverse=True)
+    write(DATA_FILE, json.dumps(stored, ensure_ascii=False, indent=1))
+    build_site(shown)
+    print(f"Sitio generado en {OUT}/ con {len(shown)} notas con imagen "
+          f"({len(hidden)} sin imagen no se muestran, {pending} pendientes de buscar su foto).")
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@
   "max_articles": 400,
   "max_new_per_run": 30,
   "home_initial": 30,
+  "analytics": {"goatcounter": "buenasnews"},
   "summary_max_chars": 700,
   "ai_summary_max_chars": 1500,
   "full_text_max_chars": 30000,
