@@ -1,5 +1,29 @@
 [
  {
+  "id": "a36776e57e",
+  "slug": "el-doe-celebra-los-avances-en-los-trabajos-de-limpieza-ambie-a36776e57e",
+  "title": "El DOE celebra los avances en los trabajos de limpieza ambiental en Oak Ridge",
+  "summary": "El Departamento de Energía de los Estados Unidos (DOE, por sus siglas en inglés) celebra los avances en los trabajos de limpieza ambiental en Oak Ridge, los cuales marcan el inicio de una nueva etapa nuclear para el país. Según detallaron, el personal multidisciplinario logró demoler 10 edificios en tan solo dos meses, retirar de forma segura 3 millones de libras de residuos y deshacerse de 4 tanques de 2000 libras de gas inerte . Durante el fin de semana pasado, las autoridades del DOE visitaron Tennessee para observar de primera mano el avance de los proyectos de la Agencia de Gestión Ambiental .",
+  "category": "Medio ambiente",
+  "image": "https://www.ecoportal.net/wp-content/uploads/2026/11/doe-oak-ridge.jpg",
+  "img_tried": true,
+  "source": "Ecoportal",
+  "url": "https://www.ecoportal.net/energia/doe-avances-limpieza-oak-ridge/",
+  "date": "2026-11-20T19:34:28+00:00"
+ },
+ {
+  "id": "152ef7c864",
+  "slug": "fact-check-es-cierto-que-los-pozos-tardan-en-recuperarse-aun-152ef7c864",
+  "title": "Fact-check: ¿Es cierto que los pozos tardan en recuperarse aunque vuelva a llover tras una sequía?",
+  "summary": "Cuando una sequía prolongada finaliza y vuelven las lluvias, se tiende a pensar de que el restablecimiento de la saturación hídrica es cuestión de tiempo . No obstante, los propios especialistas en hidrología indican que la lluvia no es sinónimo de recuperación de las aguas subterráneas. Aun después de varios episodios de lluvia, los pozos de agua domésticos y agrícolas podrían continuar secos o en niveles críticos durante largo tiempo. ¿Es cierto que las aguas subterráneas reaparecen mucho más lentamente que los ríos o pantanos superficiales? Las causas de que la lluvia no recargue instantáneamente los pozos Las lluvias no recargan los acuíferos de forma inmediata.",
+  "category": "Ciencia",
+  "image": "https://www.ecoportal.net/wp-content/uploads/2026/11/ARGENTINA-4-1.jpg",
+  "img_tried": true,
+  "source": "Ecoportal",
+  "url": "https://www.ecoportal.net/tecnologia/fact-check-pozos-tras-una-sequia/",
+  "date": "2026-11-20T18:06:35+00:00"
+ },
+ {
   "id": "1b5b3d358b",
   "slug": "desarrollan-un-software-que-podria-reducir-hasta-un-50-la-el-1b5b3d358b",
   "title": "Desarrollan un software que podría reducir hasta un 50 % la electricidad necesaria para entrenar inteligencia artificial sin perder velocidad",
